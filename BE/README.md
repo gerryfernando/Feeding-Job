@@ -21,8 +21,12 @@ open terminal
 
 Install library with
 
-## npm install
+```bash
+npm install
+```
 
-Start the apps with
+and start the apps with
 
-## node .
+```bash
+node .
+```
