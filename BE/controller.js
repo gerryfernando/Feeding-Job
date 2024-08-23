@@ -47,11 +47,15 @@ class Controller {
       data: null,
     };
     try {
-      response.message = "Get data jobs success";
-      response.data = result;
+      const jobData = await knex("jobs").select("*");
+      const data = jobData || [];
+
+      response.message = "Get list jobs success";
+      response.data = data;
       res.status(200).json(response);
     } catch (error) {
-      res.status(500).json({ message: "Get data jobs failed" });
+      response.message = "error: " + error;
+      res.status(500).json(response);
     }
   }
 

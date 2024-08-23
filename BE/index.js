@@ -20,10 +20,10 @@ app.get("/ping", async (req, res) => {
 app.get("/scrap", Controller.getScrapJobs);
 app.get("/download", Controller.downloadExcel);
 //Jobs
-app.get("/jobs", Controller.getJobs);
-app.post("/jobs", Controller.createJobs);
-app.put("/jobs/:id", Controller.editJobs);
-app.delete("/jobs/:id", Controller.deleteJobs);
+app.get("/job", Controller.getJobs);
+app.post("/job", Controller.createJobs);
+app.put("/job/:id", Controller.editJobs);
+app.delete("/job/:id", Controller.deleteJobs);
 
 app.listen(PORT, (error) => {
   if (!error)
