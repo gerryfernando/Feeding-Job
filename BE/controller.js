@@ -65,6 +65,13 @@ class Controller {
       data: null,
     };
     try {
+      await knex("jobs").insert({
+        job_name: payload.jobName,
+        location: payload.location,
+        description: payload.description,
+        company: payload.company,
+      });
+
       response.message = "Create jobs success";
       response.data = result;
       res.status(200).json(response);
@@ -79,6 +86,18 @@ class Controller {
       data: null,
     };
     try {
+      const payload = req.body;
+      const id = req.params.id;
+      await knex("cart")
+        .where({
+          id: id,
+        })
+        .update({
+          job_name: payload.jobName,
+          location: payload.location,
+          description: payload.description,
+          company: payload.company,
+        });
       response.message = "Edit jobs success";
       response.data = result;
       res.status(200).json(response);
@@ -93,6 +112,10 @@ class Controller {
       data: null,
     };
     try {
+      const id = req.params.id;
+
+      await knex("jobs").where("id", id).del();
+
       response.message = "Delete jobs success";
       response.data = result;
       res.status(200).json(response);
