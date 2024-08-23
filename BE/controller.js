@@ -1,170 +1,152 @@
 const knex = require("./knex");
-const moment = require("moment");
+const express = require("express");
+const axios = require("axios");
+const cheerio = require("cheerio");
+const dotenv = require("dotenv");
+const Job = require("./model/jobDummy");
+const excelJS = require("exceljs");
+
+dotenv.config();
 
 class Controller {
-  static async getTable(req, res) {
+  static async getScrapJobs(req, res) {
     let response = {
       message: "",
       data: null,
     };
     try {
-      const table = await knex("table").select("*");
-      const data = table || [];
-
-      response.message = "Get list table success";
-      response.data = data;
-      res.status(200).json(response);
-    } catch (error) {
-      console.log(error);
-      response.message = "error: " + error;
-      res.status(500).json(response);
-    }
-  }
-
-  static async getMenu(req, res) {
-    let response = {
-      message: "",
-      data: null,
-    };
-    try {
-      const menu = await knex("menu").select("*");
-      const data = menu || [];
-
-      response.message = "Get list menu success";
-      response.data = data;
-      res.status(200).json(response);
-    } catch (error) {
-      console.log(error);
-      response.message = "error: " + error;
-      res.status(500).json(response);
-    }
-  }
-
-  static async getCart(req, res) {
-    let response = {
-      message: "",
-      data: null,
-    };
-    try {
-      const tableId = req.params.tableId;
-      const cart = await knex("cart")
-        .join("menu", "cart.menu_id", "menu.id")
-        .join("table", "cart.table_id", "table.id")
-        .where("table.id", tableId)
-        .where("cart.status", "PROGRESS")
-        .where("cart.qty", ">", 0)
-        .select(
-          "cart.id",
-          "menu.price",
-          "menu.name",
-          "cart.qty",
-          "menu.image_url",
-          "cart.status",
-          knex.raw("cart.qty*menu.price as total")
-        );
-      const data = cart || [];
-
-      response.message = "Get list cart success";
-      response.data = data;
-      res.status(200).json(response);
-    } catch (error) {
-      console.log(error);
-      response.message = "error: " + error;
-      res.status(500).json(response);
-    }
-  }
-
-  static async addCart(req, res) {
-    let response = {
-      message: "",
-      data: null,
-    };
-    try {
-      const payload = req.body;
-      const existingCart = await knex("cart")
-        .where({
-          menu_id: payload.menuId,
-          table_id: payload.tableId,
-          status: "PROGRESS",
-        })
-        .first();
-      if (existingCart) {
-        await knex("cart")
-          .where({
-            id: existingCart.id,
-            menu_id: payload.menuId,
-            table_id: payload.tableId,
-          })
-          .update({
-            qty: existingCart.qty + payload.qty,
-            status: "PROGRESS",
-          });
-      } else {
-        await knex("cart").insert({
-          menu_id: payload.menuId,
-          table_id: payload.tableId,
-          qty: payload.qty,
-          status: "PROGRESS",
-        });
-      }
-
-      response.message = "Add cart data success";
-      res.status(200).json(response);
-    } catch (error) {
-      console.log(error);
-      response.message = "error: " + error;
-      res.status(500).json(response);
-    }
-  }
-
-  static async updateCart(req, res) {
-    let response = {
-      message: "",
-      data: null,
-    };
-    try {
-      const payload = req.body;
-      await knex("cart").where("id", payload.cartId).update({
-        qty: payload.qty,
+      // const url = process.env.URL_SCRAP;
+      const url = "https://www.octaveclothing.com/men";
+      let raw_data;
+      //Get Data
+      await axios.get(url).then((response) => {
+        raw_data = response.data;
       });
+      console.log(raw_data);
 
-      response.message = "Update cart data success";
+      const $ = cheerio.load(raw_data);
+
+      const result = [];
+      $("table.RntSmf").each((i, elem) => {
+        const imgSrc = $(elem).find("img").attr("src");
+        const text = $(elem).find("span:first-child").text();
+        result.push({ imgSrc, text });
+      });
+      response.message = "Scraping data success";
+      response.data = result;
       res.status(200).json(response);
     } catch (error) {
-      console.log(error);
-      response.message = "error: " + error;
-      res.status(500).json(response);
+      console.error("Error scraping data:", error);
+      res.status(500).json({ message: "Error scraping data" });
     }
   }
 
-  static async order(req, res) {
+  static async getJobs(req, res) {
     let response = {
       message: "",
       data: null,
     };
     try {
-      const payload = req.body;
-      if (payload.tableId === payload.newTableId) {
-        await knex("cart")
-          .where({ table_id: payload.tableId, status: "PROGRESS" })
-          .update({
-            status: "COMPLETED",
-          });
-      } else {
-        await knex("cart")
-          .where({ table_id: payload.tableId, status: "PROGRESS" })
-          .update({
-            status: "COMPLETED",
-            table_id: payload.newTableId,
-          });
-      }
-
-      response.message = "Order success";
+      response.message = "Get data jobs success";
+      response.data = result;
       res.status(200).json(response);
     } catch (error) {
-      console.log(error);
-      response.message = "error: " + error;
-      res.status(500).json(response);
+      res.status(500).json({ message: "Get data jobs failed" });
+    }
+  }
+
+  static async createJobs(req, res) {
+    let response = {
+      message: "",
+      data: null,
+    };
+    try {
+      response.message = "Create jobs success";
+      response.data = result;
+      res.status(200).json(response);
+    } catch (error) {
+      res.status(500).json({ message: "Create jobs failed" });
+    }
+  }
+
+  static async editJobs(req, res) {
+    let response = {
+      message: "",
+      data: null,
+    };
+    try {
+      response.message = "Edit jobs success";
+      response.data = result;
+      res.status(200).json(response);
+    } catch (error) {
+      res.status(500).json({ message: "Edit jobs failed" });
+    }
+  }
+
+  static async deleteJobs(req, res) {
+    let response = {
+      message: "",
+      data: null,
+    };
+    try {
+      response.message = "Delete jobs success";
+      response.data = result;
+      res.status(200).json(response);
+    } catch (error) {
+      res.status(500).json({ message: "Delete jobs failed" });
+    }
+  }
+
+  static async downloadExcel(req, res) {
+    let response = {
+      message: "",
+      data: null,
+    };
+    const workbook = new excelJS.Workbook();
+    const worksheet = workbook.addWorksheet("My Users");
+    const path = "./files";
+
+    worksheet.columns = [
+      { header: "No.", key: "no", width: 10 },
+      { header: "Company", key: "company", width: 20 },
+      { header: "Jobs", key: "jobName", width: 20 },
+      { header: "Description", key: "description", width: 20 },
+      { header: "Location", key: "loc", width: 20 },
+    ];
+
+    let counter = 1;
+
+    Job.forEach((user) => {
+      user.no = counter;
+      worksheet.addRow(user);
+      counter++;
+    });
+
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true, color: { argb: "004e47cc" } };
+    });
+
+    worksheet.getColumn(2).eachCell((cell) => {
+      cell.alignment = {
+        vertical: "middle",
+        horizontal: "center",
+        wrapText: true,
+      };
+    });
+
+    try {
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      res.setHeader("Content-Disposition", `attachment; filename=jobs.xlsx`);
+
+      return workbook.xlsx.write(res).then(() => {
+        response.message = "Download success";
+        res.status(200).json(response);
+      });
+    } catch (err) {
+      res.status(500).json({ message: "Error downloading data" });
     }
   }
 }
