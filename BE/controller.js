@@ -3,7 +3,6 @@ const express = require("express");
 const axios = require("axios");
 const cheerio = require("cheerio");
 const dotenv = require("dotenv");
-const Job = require("./model/jobDummy");
 const excelJS = require("exceljs");
 
 dotenv.config();
@@ -22,7 +21,6 @@ class Controller {
       await axios.get(url).then((response) => {
         raw_data = response.data;
       });
-      console.log(raw_data);
 
       const $ = cheerio.load(raw_data);
 
@@ -31,6 +29,7 @@ class Controller {
         const imgSrc = $(elem).find("img").attr("src");
         const text = $(elem).find("span:first-child").text();
         result.push({ imgSrc, text });
+        console.log(imgSrc, text);
       });
       response.message = "Scraping data success";
       response.data = result;
@@ -65,6 +64,7 @@ class Controller {
       data: null,
     };
     try {
+      const payload = req.body;
       await knex("jobs").insert({
         job_name: payload.jobName,
         location: payload.location,
@@ -73,7 +73,6 @@ class Controller {
       });
 
       response.message = "Create jobs success";
-      response.data = result;
       res.status(200).json(response);
     } catch (error) {
       res.status(500).json({ message: "Create jobs failed" });
@@ -88,7 +87,8 @@ class Controller {
     try {
       const payload = req.body;
       const id = req.params.id;
-      await knex("cart")
+
+      await knex("jobs  ")
         .where({
           id: id,
         })
@@ -99,7 +99,6 @@ class Controller {
           company: payload.company,
         });
       response.message = "Edit jobs success";
-      response.data = result;
       res.status(200).json(response);
     } catch (error) {
       res.status(500).json({ message: "Edit jobs failed" });
@@ -117,7 +116,6 @@ class Controller {
       await knex("jobs").where("id", id).del();
 
       response.message = "Delete jobs success";
-      response.data = result;
       res.status(200).json(response);
     } catch (error) {
       res.status(500).json({ message: "Delete jobs failed" });
@@ -131,19 +129,18 @@ class Controller {
     };
     const workbook = new excelJS.Workbook();
     const worksheet = workbook.addWorksheet("My Users");
-    const path = "./files";
 
     worksheet.columns = [
       { header: "No.", key: "no", width: 10 },
-      { header: "Company", key: "company", width: 20 },
-      { header: "Jobs", key: "jobName", width: 20 },
-      { header: "Description", key: "description", width: 20 },
-      { header: "Location", key: "loc", width: 20 },
+      { header: "Job Name", key: "job_name", width: 30 },
+      { header: "Company", key: "company", width: 30 },
+      { header: "Location", key: "location", width: 20 },
+      { header: "Description", key: "description", width: 40 },
     ];
 
     let counter = 1;
-
-    Job.forEach((user) => {
+    const jobData = await knex("jobs").select("*");
+    jobData.forEach((user) => {
       user.no = counter;
       worksheet.addRow(user);
       counter++;
@@ -159,6 +156,7 @@ class Controller {
         horizontal: "center",
         wrapText: true,
       };
+      cell.font = { bold: true };
     });
 
     try {
