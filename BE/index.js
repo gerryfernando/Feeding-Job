@@ -17,17 +17,13 @@ app.get("/ping", async (req, res) => {
   res.status(200).send("pong");
 });
 
-app.get("/table", Controller.getTable);
-
-app.get("/menu", Controller.getMenu);
-
-app.get("/cart/:tableId", Controller.getCart);
-
-app.post("/cart", Controller.addCart);
-
-app.put("/cart", Controller.updateCart);
-
-app.post("/order", Controller.order);
+app.get("/scrap", Controller.getScrapJobs);
+app.get("/download", Controller.downloadExcel);
+//Jobs
+app.get("/jobs", Controller.getJobs);
+app.post("/jobs", Controller.createJobs);
+app.put("/jobs/:id", Controller.editJobs);
+app.delete("/jobs/:id", Controller.deleteJobs);
 
 app.listen(PORT, (error) => {
   if (!error)
