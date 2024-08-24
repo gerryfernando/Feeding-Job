@@ -4,6 +4,7 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const dotenv = require("dotenv");
 const excelJS = require("exceljs");
+const moment = require("moment");
 
 dotenv.config();
 
@@ -14,28 +15,44 @@ class Controller {
       data: null,
     };
     try {
-      // const url = process.env.URL_SCRAP;
-      const url = "https://www.octaveclothing.com/men";
+      const url = process.env.URL_SCRAP;
       let raw_data;
       //Get Data
-      await axios.get(url).then((response) => {
-        raw_data = response.data;
-      });
-
+      const { data } = await axios.get(url);
+      raw_data = data;
       const $ = cheerio.load(raw_data);
-
       const result = [];
-      $("table.RntSmf").each((i, elem) => {
-        const imgSrc = $(elem).find("img").attr("src");
-        const text = $(elem).find("span:first-child").text();
-        result.push({ imgSrc, text });
-        console.log(imgSrc, text);
+
+      const scriptContent = $('script[data-automation="server-state"]').html();
+
+      // Extract JSON strings using regular expressions
+      const reduxDataMatch = scriptContent.match(
+        /window\.SEEK_REDUX_DATA\s*=\s*(\{.*?\});/
+      );
+
+      // Parse JSON data
+      const reduxData = reduxDataMatch ? JSON.parse(reduxDataMatch[1]) : {};
+      const jobs = reduxData?.results?.results?.jobs;
+
+      jobs.forEach((val) => {
+        let jobData = {};
+        jobData.jobName = val.title;
+        jobData.company = val.companyName;
+        jobData.benefit = val.bulletPoints;
+        jobData.location = val.jobLocation.label;
+        jobData.publishDate = moment(val.listingDate).format(
+          "DD-MMMM-yyyy HH:mm"
+        );
+        jobData.salary = val.salary;
+        jobData.description = val.teaser;
+        jobData.workType = val.workType;
+
+        result.push(jobData);
       });
       response.message = "Scraping data success";
       response.data = result;
       res.status(200).json(response);
     } catch (error) {
-      console.error("Error scraping data:", error);
       res.status(500).json({ message: "Error scraping data" });
     }
   }
