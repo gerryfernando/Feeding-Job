@@ -17,7 +17,6 @@ const TextFieldCom = ({
   size = "small",
   placeholder,
   label,
-  isTextArea = false,
   rows = 3,
   required = false,
   endIcon,
@@ -25,7 +24,6 @@ const TextFieldCom = ({
   max,
   min,
   readOnly,
-  validation,
   ...props
 }) => {
   const { register } = rhf;
@@ -53,7 +51,12 @@ const TextFieldCom = ({
       {label && (
         <InputLabel
           required={!!required}
-          sx={{ mb: "4px" }}
+          sx={{
+            mb: "4px",
+            "& .MuiFormLabel-asterisk": {
+              color: "red",
+            },
+          }}
           htmlFor={name}
           error={!!error}
         >
@@ -62,10 +65,7 @@ const TextFieldCom = ({
       )}
       <TextField
         {...register(name, {
-          required: required && "Kolom ini wajib diisi",
-          validate: {
-            ...validation,
-          },
+          required: required && "This field is required",
         })}
         size={size}
         placeholder={placeholder}
@@ -73,9 +73,7 @@ const TextFieldCom = ({
         defaultValue={defaultValue}
         disabled={disabled}
         error={!!error}
-        multiline={isTextArea}
-        rows={isTextArea ? rows : 1}
-        type={isNumber ? "number" : "text"}
+        type={"text"}
         value={value}
         inputProps={{
           maxLength: maxLength || null,

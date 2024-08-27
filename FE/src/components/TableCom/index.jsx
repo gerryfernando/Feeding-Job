@@ -6,6 +6,7 @@ import {
   Edit,
   Visibility,
 } from "@mui/icons-material";
+import { LoadingButton } from "@mui/lab";
 import {
   Box,
   Grid,
@@ -13,8 +14,8 @@ import {
   Stack,
   TextField,
   styled,
-  Button,
   Typography,
+  Pagination,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
@@ -24,15 +25,10 @@ const TableCom = ({
   rows,
   columns,
   pageSize,
-  pageNo,
-  total,
-  onChangePage,
-  onChangePageSize,
   disableColumnMenu = true,
   disableColumnFilter = true,
   disableColumnSelector = true,
   disableColumnSorting = true,
-  hideFooter = false,
   loading = false,
   actions,
   handleView,
@@ -40,33 +36,12 @@ const TableCom = ({
   handleAdd,
   handleDownload,
   handleDelete,
-  handleSearch,
-  maxHeight = "fit-content",
-  autoHeight = false,
+  maxHeight = "690px",
 }) => {
   const [searchData, setSearchData] = useState(null);
-  const handleDataRow = (page, size, data) => {
-    const arr = [];
-    let startIndex;
-    let endIndex;
-    if (size === 1) {
-      startIndex = page - 1;
-      endIndex = page;
-    } else {
-      startIndex = page === 1 ? 0 : (page - 1) * size;
-      endIndex = page === 1 ? size : page * size;
-    }
-    for (let i = startIndex; i < endIndex; i++) {
-      if (data[i]) {
-        arr.push(data[i]);
-      }
-    }
-    return arr;
-  };
 
   const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     border: 0,
-    minHeight: !!rows.length ? "default" : "450px",
     "& .MuiDataGrid-main": {
       boxShadow: "0px 3px 3px rgba(0, 0, 0, 0.25)",
       marginLeft: "5px",
@@ -105,8 +80,10 @@ const TableCom = ({
     },
     "& .MuiDataGrid-cell": {
       fontWeight: 400,
+      padding: "20px 10px",
       fontSize: "16px",
-      lineHeight: "17px",
+      alignItems: "center",
+      display: "flex",
       borderBottom: "none",
     },
     "& .MuiDataGrid-row:last-child": {
@@ -119,8 +96,7 @@ const TableCom = ({
     const actionCount =
       (actions.view ? 1 : 0) +
       (actions.edit ? 1 : 0) +
-      (actions.delete ? 1 : 0) +
-      (actions.download ? 1 : 0);
+      (actions.delete ? 1 : 0);
     switch (actionCount) {
       case 1:
         return 100;
@@ -147,12 +123,13 @@ const TableCom = ({
     flex: 1,
     sortable: false,
     align: "center",
+    alignItems: "center",
     headerAlign: "center",
     renderCell: ({ row }) =>
       loading ? (
         "Loading"
       ) : (
-        <Stack spacing={1} direction="row">
+        <Stack spacing={1} direction="row" alignItems="center" display="flex">
           {actions?.view && (
             <IconButton>
               <Visibility onClick={() => handleView(row)} />
@@ -163,7 +140,6 @@ const TableCom = ({
               <Edit onClick={() => handleEdit(row)} sx={{ color: "#32BEA6" }} />
             </IconButton>
           )}
-
           {actions?.delete && (
             <IconButton onClick={() => handleDelete(row)}>
               <Delete color="error" />
@@ -172,12 +148,6 @@ const TableCom = ({
         </Stack>
       ),
   };
-
-  const NoRowsOverlay = () => (
-    <Stack height="325px" alignItems="center" justifyContent="center">
-      No Data
-    </Stack>
-  );
 
   return (
     <Grid container spacing={2}>
@@ -203,25 +173,37 @@ const TableCom = ({
                 direction={{ xs: "column", sm: "column", md: "row" }}
                 spacing="20px"
               >
-                {actions?.search && (
-                  <TextField
-                    fullWidth
-                    sx={{
-                      minWidth: { xs: "auto", sm: "auto", md: "300px" },
-                    }}
-                    InputProps={{
-                      style: {
-                        borderRadius: "8px",
-                      },
-                    }}
-                    value={searchData}
-                    onChange={(e) => setSearchData(e.target.value)}
-                    size="small"
-                    placeholder="Search..."
-                  />
+                {actions?.search && <></>}
+                {!!actions?.customButton?.length && (
+                  <>
+                    {actions?.customButton?.map((val, idx) => {
+                      if (val.show) {
+                        return (
+                          <LoadingButton
+                            key={`${idx}-button-custom`}
+                            size="small"
+                            sx={{
+                              minWidth: "137px",
+                              height: { xs: "40px", sm: "40px", md: "unset" },
+                              borderRadius: "5px",
+                            }}
+                            loading={loading}
+                            onClick={val.handleClick}
+                            variant="contained"
+                            color="secondary"
+                            fontcolor="#ffffff"
+                          >
+                            {val.text}
+                          </LoadingButton>
+                        );
+                      }
+                      return true;
+                    })}
+                  </>
                 )}
                 {actions?.download && (
-                  <Button
+                  <LoadingButton
+                    size="small"
                     sx={{
                       minWidth: "137px",
                       height: { xs: "40px", sm: "40px", md: "unset" },
@@ -235,10 +217,11 @@ const TableCom = ({
                     endIcon={<Download />}
                   >
                     Download
-                  </Button>
+                  </LoadingButton>
                 )}
                 {actions?.add && (
-                  <Button
+                  <LoadingButton
+                    size="small"
                     sx={{
                       minWidth: "137px",
                       height: { xs: "40px", sm: "40px", md: "unset" },
@@ -251,7 +234,7 @@ const TableCom = ({
                     endIcon={<AddCircle />}
                   >
                     Add Job
-                  </Button>
+                  </LoadingButton>
                 )}
               </Stack>
             </Grid>
@@ -261,15 +244,14 @@ const TableCom = ({
       <Grid item xs={12}>
         <Box
           sx={{
-            // minHeight: 500,
             width: "100%",
-            maxHeight: maxHeight,
+            height: maxHeight,
             overflowY: "auto",
           }}
         >
           <StyledDataGrid
-            autoHeight={!!rows?.length}
-            getRowHeight={autoHeight ? () => "auto" : undefined}
+            autoHeight={rows.length < 5}
+            getRowHeight={() => "auto"}
             textAlign="center"
             rows={rows}
             columns={actions?.show ? [...columns, ActionMenu] : columns}
@@ -277,27 +259,31 @@ const TableCom = ({
             checkboxSelection={false}
             disableSelectionOnClick
             // hideFooter={hideFooter}
-            hideFooter
             disableColumnMenu={disableColumnMenu}
             disableColumnFilter={disableColumnFilter}
             disableColumnSelector={disableColumnSelector}
             disableColumnSorting={disableColumnSorting}
             loading={loading}
-            components={{
-              NoRowsOverlay: NoRowsOverlay,
-              // Pagination: (paginationProps) => (
-              //   <JdPagination
-              //     {...paginationProps}
-              //     pageSize={pageSize}
-              //     pageNo={pageNo}
-              //     total={total}
-              //     onChangePage={onChangePage}
-              //     onChangePageSize={onChangePageSize}
-              //     row={rows}
-              //     setDataRow={setDataRow}
-              //   />
-              // ),
+            pageSizeOptions={[10, 25, 50, 100]}
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: 10, page: 0 },
+              },
             }}
+            // components={{
+            //   Pagination: (paginationProps) => (
+            //     <Pagination
+            //       {...paginationProps}
+            //       page={pageNo}
+            //       count={Math.ceil(total / pageSize)}
+            //       onChange={(e, value) => {
+            //         onChangePage(e, value);
+            //       }}
+            //       variant="outlined"
+            //       shape="rounded"
+            //     />
+            //   ),
+            // }}
           />
         </Box>
       </Grid>
