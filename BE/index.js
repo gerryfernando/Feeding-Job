@@ -17,7 +17,7 @@ app.get("/ping", async (req, res) => {
   res.status(200).send("pong");
 });
 
-app.get("/scrap", Controller.getScrapJobs);
+app.get("/scrap/:jobTag", Controller.getScrapJobs);
 app.get("/download", Controller.downloadExcel);
 //Jobs
 app.get("/job", Controller.getJobs);
