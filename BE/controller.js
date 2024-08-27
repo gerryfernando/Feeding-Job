@@ -13,9 +13,11 @@ class Controller {
     let response = {
       message: "",
       data: null,
+      length: 0,
     };
     try {
-      const url = process.env.URL_SCRAP;
+      const jobTag = req.params.jobTag;
+      const url = `https://id.jobstreet.com/id/${jobTag}-jobs`;
       let raw_data;
       //Get Data
       const { data } = await axios.get(url);
@@ -36,20 +38,22 @@ class Controller {
 
       jobs.forEach((val) => {
         let jobData = {};
-        jobData.jobName = val.title;
+        jobData.job_name = val.title;
+        jobData.description = val.teaser;
         jobData.company = val.companyName;
-        jobData.benefit = val.bulletPoints;
         jobData.location = val.jobLocation.label;
-        jobData.publishDate = moment(val.listingDate).format(
-          "DD-MMMM-yyyy HH:mm"
+        jobData.publish_date = moment(val.listingDate).format(
+          "YYYY-MM-DD HH:mm:ss"
         );
         jobData.salary = val.salary;
-        jobData.description = val.teaser;
-        jobData.workType = val.workType;
-
+        jobData.benefit = JSON.stringify(val.bulletPoints);
+        jobData.work_type = val.workType;
+        jobData.job_tag = jobTag;
         result.push(jobData);
       });
+      await knex("jobs").insert(result);
       response.message = "Scraping data success";
+      response.length = result.length;
       response.data = result;
       res.status(200).json(response);
     } catch (error) {
@@ -61,11 +65,23 @@ class Controller {
     let response = {
       message: "",
       data: null,
+      total: 0,
     };
+    const jobTag = req.query.filter;
     try {
-      const jobData = await knex("jobs").select("*");
-      const data = jobData || [];
+      const jobData = await knex("jobs")
+        .modify((queryBuilder) => {
+          if (jobTag !== "all" && jobTag) {
+            queryBuilder.where("job_tag", jobTag);
+          }
+        })
+        .select("*");
+      const data = (jobData || []).map((val) => ({
+        ...val,
+        benefit: JSON.parse(val?.benefit),
+      }));
 
+      response.total = jobData.length;
       response.message = "Get list jobs success";
       response.data = data;
       res.status(200).json(response);
@@ -87,8 +103,11 @@ class Controller {
         location: payload.location,
         description: payload.description,
         company: payload.company,
+        salary: payload.salary,
+        benefit: JSON.stringify(payload.benefit),
+        work_type: payload.workType,
+        job_tag: payload.jobTag,
       });
-
       response.message = "Create jobs success";
       res.status(200).json(response);
     } catch (error) {
@@ -114,6 +133,11 @@ class Controller {
           location: payload.location,
           description: payload.description,
           company: payload.company,
+          salary: payload.salary,
+          benefit: JSON.stringify(payload.benefit),
+          work_type: payload.workType,
+          job_tag: payload.jobTag,
+          // updated_at: moment().utc().format("YYYY-MM-DD HH:mm:ss"),
         });
       response.message = "Edit jobs success";
       res.status(200).json(response);
@@ -149,10 +173,14 @@ class Controller {
 
     worksheet.columns = [
       { header: "No.", key: "no", width: 10 },
-      { header: "Job Name", key: "job_name", width: 30 },
-      { header: "Company", key: "company", width: 30 },
-      { header: "Location", key: "location", width: 20 },
-      { header: "Description", key: "description", width: 40 },
+      { header: "Job Name", key: "job_name", width: 50 },
+      { header: "Company", key: "company", width: 35 },
+      { header: "Location", key: "location", width: 30 },
+      { header: "Description", key: "description", width: 100 },
+      { header: "Salary", key: "salary", width: 35 },
+      { header: "Benefit", key: "benefit", width: 35 },
+      { header: "Work Type", key: "work_type", width: 20 },
+      { header: "Publish Date", key: "publish_date", width: 20 },
     ];
 
     let counter = 1;
@@ -165,16 +193,22 @@ class Controller {
 
     worksheet.getRow(1).eachCell((cell) => {
       cell.font = { bold: true, color: { argb: "004e47cc" } };
-    });
-
-    worksheet.getColumn(2).eachCell((cell) => {
       cell.alignment = {
         vertical: "middle",
         horizontal: "center",
-        wrapText: true,
       };
-      cell.font = { bold: true };
     });
+
+    // worksheet.getColumn(2).eachCell((cell, rowNumber) => {
+    //   if (rowNumber > 1) {
+    //     cell.alignment = {
+    //       vertical: "middle",
+    //       horizontal: "center",
+    //       wrapText: true,
+    //     };
+    //     cell.font = { bold: true };
+    //   }
+    // });
 
     try {
       res.setHeader(
@@ -183,10 +217,7 @@ class Controller {
       );
       res.setHeader("Content-Disposition", `attachment; filename=jobs.xlsx`);
 
-      return workbook.xlsx.write(res).then(() => {
-        response.message = "Download success";
-        res.status(200).json(response);
-      });
+      return workbook.xlsx.write(res);
     } catch (err) {
       res.status(500).json({ message: "Error downloading data" });
     }
