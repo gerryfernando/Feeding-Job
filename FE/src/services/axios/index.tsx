@@ -9,19 +9,19 @@ const API = axios.create({
 API.interceptors.request.use(
   (config) => {
     // Modify the request config here (add headers, authentication tokens)
-    const getToken =
-      typeof window !== "undefined"
-        ? localStorage.getItem("token")
-        : "";
-    const accessToken = getToken;
+    // const getToken =
+    //   typeof window !== "undefined"
+    //     ? localStorage.getItem("token")
+    //     : "";
+    // const accessToken = getToken;
 
-    // If token is present add it to request's Authorization Header
-    if (accessToken) {
-      if (config.headers) {
-        config.headers.token = `Bearer ${accessToken}`;
-        config.headers.Authorization = `Bearer ${accessToken}`;
-      }
-    }
+    // // If token is present add it to request's Authorization Header
+    // if (accessToken) {
+    //   if (config.headers) {
+    //     config.headers.token = `Bearer ${accessToken}`;
+    //     config.headers.Authorization = `Bearer ${accessToken}`;
+    //   }
+    // }
     return config;
   },
   (error) => {
