@@ -80,8 +80,8 @@ const TextFieldCom = ({
           max: max,
           min: min,
         }}
+        InputProps={{ ...InputProps, sx: { borderRadius: "10px" } }}
         {...props}
-        {...InputProps}
       />
       {helperText && (
         <FormHelperText error={error} htmlFor={name}>

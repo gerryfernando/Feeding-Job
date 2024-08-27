@@ -43,7 +43,7 @@ const ModalCom = ({
       fullWidth
       hideBackdrop
     >
-      <DialogTitle mb={{ xs: 1, sm: title ? "42px" : "0px" }}>
+      <DialogTitle mb={{ xs: 1, sm: title ? "15px" : "0px" }}>
         {title && (
           <>
             <Typography fontSize={{ xs: 24, sm: 36 }} fontWeight={800}>

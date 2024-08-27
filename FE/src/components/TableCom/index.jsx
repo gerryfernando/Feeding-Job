@@ -16,9 +16,14 @@ import {
   styled,
   Typography,
   Pagination,
+  Select,
+  FormControl,
+  MenuItem,
+  InputLabel,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
+import OptionsJobTag from "../../const/Options";
 
 const TableCom = ({
   title,
@@ -36,7 +41,8 @@ const TableCom = ({
   handleAdd,
   handleDownload,
   handleDelete,
-  maxHeight = "690px",
+  filterProps,
+  maxHeight = "682px",
 }) => {
   const [searchData, setSearchData] = useState(null);
 
@@ -113,7 +119,7 @@ const TableCom = ({
 
   const ActionMenu = {
     field: "action",
-    headerName: "Aksi",
+    headerName: "Action",
     get maxWidth() {
       return determineWidth(actions);
     },
@@ -161,6 +167,7 @@ const TableCom = ({
               sm: "space-between",
             }}
             alignItems="center"
+            mb={1}
           >
             <Grid item>
               <Typography fontSize={25} fontWeight={700}>
@@ -173,7 +180,28 @@ const TableCom = ({
                 direction={{ xs: "column", sm: "column", md: "row" }}
                 spacing="20px"
               >
-                {actions?.search && <></>}
+                {actions?.filter && (
+                  <FormControl>
+                    <TextField
+                      select
+                      size="small"
+                      labelId="filter-table-label"
+                      id="filter-table"
+                      sx={{ minWidth: "200px" }}
+                      InputProps={{ sx: { borderRadius: "5px" } }}
+                      label="Filter Jobs Data"
+                      value={filterProps?.value}
+                      onChange={(e) => filterProps?.setValue(e.target.value)}
+                    >
+                      <MenuItem value="all">All</MenuItem>
+                      {OptionsJobTag.map((val) => {
+                        return (
+                          <MenuItem value={val?.value}>{val?.label}</MenuItem>
+                        );
+                      })}
+                    </TextField>
+                  </FormControl>
+                )}
                 {!!actions?.customButton?.length && (
                   <>
                     {actions?.customButton?.map((val, idx) => {
