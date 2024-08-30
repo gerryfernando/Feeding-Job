@@ -17,7 +17,6 @@ const TextFieldCom = ({
   size = "small",
   placeholder,
   label,
-  rows = 3,
   required = false,
   endIcon,
   maxLength = 255,

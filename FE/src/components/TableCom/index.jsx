@@ -137,13 +137,13 @@ const TableCom = ({
       ) : (
         <Stack spacing={1} direction="row" alignItems="center" display="flex">
           {actions?.view && (
-            <IconButton>
-              <Visibility onClick={() => handleView(row)} />
+            <IconButton onClick={() => handleView(row)}>
+              <Visibility />
             </IconButton>
           )}
           {actions?.edit && (
-            <IconButton>
-              <Edit onClick={() => handleEdit(row)} sx={{ color: "#32BEA6" }} />
+            <IconButton onClick={() => handleEdit(row)}>
+              <Edit sx={{ color: "#32BEA6" }} />
             </IconButton>
           )}
           {actions?.delete && (
