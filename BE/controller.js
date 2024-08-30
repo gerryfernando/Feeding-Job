@@ -75,6 +75,7 @@ class Controller {
             queryBuilder.where("job_tag", jobTag);
           }
         })
+        .orderBy("id", "desc")
         .select("*");
       const data = (jobData || []).map((val) => ({
         ...val,
@@ -176,9 +177,9 @@ class Controller {
       { header: "Job Name", key: "job_name", width: 50 },
       { header: "Company", key: "company", width: 35 },
       { header: "Location", key: "location", width: 30 },
-      { header: "Description", key: "description", width: 100 },
+      { header: "Description", key: "description", width: 125 },
       { header: "Salary", key: "salary", width: 35 },
-      { header: "Benefit", key: "benefit", width: 35 },
+      { header: "Benefit", key: "benefit", width: 125 },
       { header: "Work Type", key: "work_type", width: 20 },
       { header: "Publish Date", key: "publish_date", width: 20 },
     ];
