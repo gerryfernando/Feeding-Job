@@ -185,7 +185,7 @@ class Controller {
     ];
 
     let counter = 1;
-    const jobData = await knex("jobs").select("*");
+    const jobData = await knex("jobs").orderBy("id", "desc").select("*");
     jobData.forEach((user) => {
       user.no = counter;
       worksheet.addRow(user);
