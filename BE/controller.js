@@ -99,7 +99,7 @@ class Controller {
     };
     try {
       const payload = req.body;
-      await knex("jobs").insert({
+      const [job] = await knex("jobs").insert({
         job_name: payload.jobName,
         location: payload.location,
         description: payload.description,
@@ -110,6 +110,7 @@ class Controller {
         job_tag: payload.jobTag,
       });
       response.message = "Create jobs success";
+      response.data = { id: job };
       res.status(200).json(response);
     } catch (error) {
       res.status(500).json({ message: "Create jobs failed" });
