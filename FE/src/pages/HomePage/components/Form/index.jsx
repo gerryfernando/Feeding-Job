@@ -12,7 +12,7 @@ const FormJob = (props) => {
   } = RHF;
 
   return (
-    <form id={`${formType}-Form`}>
+    <form data-testid="formJob" id={`${formType}-Form`}>
       <Grid spacing={2} container>
         <Grid item xs={12} md={6}>
           <TextFieldCom

@@ -305,8 +305,9 @@ export default function HomePage() {
   };
 
   return (
-    <div>
+    <div data-testid="homeContainer">
       <TableCom
+        testId="homeTable"
         title="Job List"
         actions={actions}
         rows={dataRow}
@@ -337,83 +338,88 @@ export default function HomePage() {
         loading={loading}
       />
       {showAlertDelete && (
-        <AlertCom
-          title={"Delete Data"}
-          loading={loading}
-          type="error"
-          width={{ xs: "80%", sm: "359px" }}
-          message={"Are you sure you want to delete this data?"}
-          open={showAlertDelete}
-          onClose={() => {
-            setShowAlertDelete(false);
-            setDeleteId(null);
-          }}
-          onConfirm={() => {
-            handleDelete(deleteId);
-          }}
-        />
+        <div data-tesdid="homeDeleteAlert">
+          <AlertCom
+            title={"Delete Data"}
+            loading={loading}
+            type="error"
+            width={{ xs: "80%", sm: "359px" }}
+            message={"Are you sure you want to delete this data?"}
+            open={showAlertDelete}
+            onClose={() => {
+              setShowAlertDelete(false);
+              setDeleteId(null);
+            }}
+            onConfirm={() => {
+              handleDelete(deleteId);
+            }}
+          />
+        </div>
       )}
       {showModalGenerateJobs && (
-        <ModalCom
-          open={showModalGenerateJobs}
-          onClose={() => {
-            setShowModalGenerateJobs(false);
-            setjobTagValue(null);
-          }}
-          loading={loading}
-          okText="Generate"
-          key="generateJobModal"
-          size="xs"
-          onConfirm={() => {
-            generateJobs();
-          }}
-          title="Generate Jobs Data"
-        >
-          <InputLabel id="jobtag" sx={{ mb: "20px" }}>
-            Please input job tag
-          </InputLabel>
+        <div data-tesdid="homeGenerateModal">
+          <ModalCom
+            open={showModalGenerateJobs}
+            onClose={() => {
+              setShowModalGenerateJobs(false);
+              setjobTagValue(null);
+            }}
+            loading={loading}
+            okText="Generate"
+            key="generateJobModal"
+            size="xs"
+            onConfirm={() => {
+              generateJobs();
+            }}
+            title="Generate Jobs Data"
+          >
+            <InputLabel id="jobtag" sx={{ mb: "20px" }}>
+              Please input job tag
+            </InputLabel>
 
-          <FormControl variant="standard" fullWidth>
-            <Select
-              labelId="generate-jobs-select-label"
-              id="generate-jobs-select"
-              value={jobTagValue}
-              onChange={(e) => setjobTagValue(e.target.value)}
-            >
-              {OptionsJobTag.map((val) => {
-                return <MenuItem value={val?.value}>{val?.label}</MenuItem>;
-              })}
-            </Select>
-          </FormControl>
-        </ModalCom>
+            <FormControl variant="standard" fullWidth>
+              <Select
+                id="generate-jobs-select"
+                value={jobTagValue}
+                onChange={(e) => setjobTagValue(e.target.value)}
+              >
+                {OptionsJobTag.map((val) => {
+                  return <MenuItem value={val?.value}>{val?.label}</MenuItem>;
+                })}
+              </Select>
+            </FormControl>
+          </ModalCom>
+        </div>
       )}
-
       {showFormModal && (
-        <ModalCom
-          open={showFormModal}
-          onClose={handleCloseModalForm}
-          loading={loading}
-          okText={formType === "view" ? "OK" : "Save"}
-          key="modalJobForm"
-          size="xl"
-          minHeight="65vh"
-          onConfirm={async () => {
-            const isValid = await RHF.trigger();
-            if (isValid) {
-              onSubmitForm();
-            }
-          }}
-          title={`${
-            formType.charAt(0).toUpperCase() + formType.slice(1)
-          } Job Data`}
-        >
-          <FormJob
-            RHF={RHF}
-            isViewOnly={formType === "view"}
-            formType={formType}
-            row={tempRow}
-          />
-        </ModalCom>
+        <div data-tesdid="homeFormModal">
+          <ModalCom
+            testId="homeFormModal"
+            open={showFormModal}
+            onClose={handleCloseModalForm}
+            loading={loading}
+            okText={formType === "view" ? "OK" : "Save"}
+            key="modalJobForm"
+            size="xl"
+            minHeight="65vh"
+            onConfirm={async () => {
+              const isValid = await RHF.trigger();
+              if (isValid) {
+                onSubmitForm();
+              }
+            }}
+            title={`${
+              formType.charAt(0).toUpperCase() + formType.slice(1)
+            } Job Data`}
+          >
+            <FormJob
+              RHF={RHF}
+              isViewOnly={formType === "view"}
+              formType={formType}
+              row={tempRow}
+            />
+          </ModalCom>
+        </div>
       )}
     </div>
   );

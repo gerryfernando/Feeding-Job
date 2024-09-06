@@ -22,9 +22,11 @@ const ModalCom = ({
   onConfirm = null,
   minHeight,
   loading,
+  testId,
 }) => {
   return (
     <Dialog
+      data-testid={testId}
       open={open}
       sx={{
         "& .MuiDialog-paper": {

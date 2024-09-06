@@ -14,6 +14,7 @@ const AlertCom = ({
   onClose = () => {},
   loading = false,
   duration = 500,
+  testId,
   sx,
 }) => {
   const colors = {
@@ -24,6 +25,7 @@ const AlertCom = ({
 
   return (
     <Modal
+      data-testid={testId}
       open={open}
       onClose={(event, reason) => {
         if (reason && reason === "backdropClick") return;

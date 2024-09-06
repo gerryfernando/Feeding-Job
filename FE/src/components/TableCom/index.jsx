@@ -42,6 +42,7 @@ const TableCom = ({
   handleDownload,
   handleDelete,
   filterProps,
+  testId,
   maxHeight = "682px",
 }) => {
   const [searchData, setSearchData] = useState(null);
@@ -156,7 +157,7 @@ const TableCom = ({
   };
 
   return (
-    <Grid container spacing={2}>
+    <Grid container data-testid={testId} spacing={2}>
       {(title || actions?.search || actions?.add) && (
         <Grid item xs={12}>
           <Grid
@@ -183,9 +184,9 @@ const TableCom = ({
                 {actions?.filter && (
                   <FormControl>
                     <TextField
+                      data-testid="filterJob"
                       select
                       size="small"
-                      labelId="filter-table-label"
                       id="filter-table"
                       sx={{ minWidth: "200px" }}
                       InputProps={{ sx: { borderRadius: "5px" } }}
@@ -193,10 +194,17 @@ const TableCom = ({
                       value={filterProps?.value}
                       onChange={(e) => filterProps?.setValue(e.target.value)}
                     >
-                      <MenuItem value="all">All</MenuItem>
-                      {OptionsJobTag.map((val) => {
+                      <MenuItem key={`options-filter-all`} value="all">
+                        All
+                      </MenuItem>
+                      {OptionsJobTag.map((val, idx) => {
                         return (
-                          <MenuItem value={val?.value}>{val?.label}</MenuItem>
+                          <MenuItem
+                            key={`options-filter-${idx}`}
+                            value={val?.value}
+                          >
+                            {val?.label}
+                          </MenuItem>
                         );
                       })}
                     </TextField>
@@ -249,6 +257,7 @@ const TableCom = ({
                 )}
                 {actions?.add && (
                   <LoadingButton
+                    data-testId="addJobData"
                     size="small"
                     sx={{
                       minWidth: "137px",
