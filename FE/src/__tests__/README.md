@@ -25,8 +25,6 @@ Test in home page
 - renders modal generate job
 - renders modal add job
 - renders form job
-- expect filter job
-- download jobs data
 
 ```
 
