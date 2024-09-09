@@ -16,10 +16,10 @@ import {
   styled,
   Typography,
   Pagination,
-  Select,
   FormControl,
   MenuItem,
   InputLabel,
+  Button,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
@@ -189,7 +189,10 @@ const TableCom = ({
                       size="small"
                       id="filter-table"
                       sx={{ minWidth: "200px" }}
-                      InputProps={{ sx: { borderRadius: "5px" } }}
+                      InputProps={{
+                        sx: { borderRadius: "5px" },
+                        "data-testid": "filterJob",
+                      }}
                       label="Filter Jobs Data"
                       value={filterProps?.value}
                       onChange={(e) => filterProps?.setValue(e.target.value)}
@@ -215,7 +218,8 @@ const TableCom = ({
                     {actions?.customButton?.map((val, idx) => {
                       if (val.show) {
                         return (
-                          <LoadingButton
+                          <Button
+                            data-testid={val.testId}
                             key={`${idx}-button-custom`}
                             size="small"
                             sx={{
@@ -230,7 +234,7 @@ const TableCom = ({
                             fontcolor="#ffffff"
                           >
                             {val.text}
-                          </LoadingButton>
+                          </Button>
                         );
                       }
                       return true;
@@ -238,7 +242,7 @@ const TableCom = ({
                   </>
                 )}
                 {actions?.download && (
-                  <LoadingButton
+                  <Button
                     size="small"
                     sx={{
                       minWidth: "137px",
@@ -253,12 +257,13 @@ const TableCom = ({
                     endIcon={<Download />}
                   >
                     Download
-                  </LoadingButton>
+                  </Button>
                 )}
                 {actions?.add && (
-                  <LoadingButton
+                  <Button
                     data-testId="addJobData"
                     size="small"
+                    aria-busy={false}
                     sx={{
                       minWidth: "137px",
                       height: { xs: "40px", sm: "40px", md: "unset" },
@@ -268,10 +273,11 @@ const TableCom = ({
                     onClick={handleAdd}
                     variant="contained"
                     fontcolor="#ffffff"
+                    type="button"
                     endIcon={<AddCircle />}
                   >
                     Add Job
-                  </LoadingButton>
+                  </Button>
                 )}
               </Stack>
             </Grid>

@@ -3,6 +3,7 @@ import "./globals.css";
 import { Container } from "@mui/material";
 import Navbar from "../components/Layout/Navbar";
 import SnackBarProvider from "../components/Provider/SnackbarProvider";
+import ThemeWrapper from "../components/Theme/index";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,10 +20,12 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
         <SnackBarProvider>
-          <Navbar />
-          <Container maxWidth="xl" sx={styles}>
-            {children}
-          </Container>
+          <ThemeWrapper>
+            <Navbar />
+            <Container maxWidth="xl" sx={styles}>
+              {children}
+            </Container>
+          </ThemeWrapper>
         </SnackBarProvider>
       </body>
     </html>
