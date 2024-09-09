@@ -54,3 +54,7 @@ GET SCRAP
 # Test to scrap/generate data from jobstreet
 - should scrap jobs data from jobstreet
 ```
+
+### Result
+
+![alt text](image.png)

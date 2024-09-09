@@ -2,7 +2,7 @@ import HomePage from "../pages/HomePage";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 describe("Test in home page", () => {
-  it("renders home page", () => {
+  it("renders home page and components", () => {
     const { container } = render(<HomePage />);
     expect(screen.getByTestId("homeContainer")).toBeInTheDocument();
     expect(screen.getByTestId("homeTable")).toBeInTheDocument();
