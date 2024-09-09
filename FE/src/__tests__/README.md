@@ -20,7 +20,7 @@ Test in home page
 
 ```bash
 Test in home page
-# Test in HOME PAGE
+# Some test case to test render and components in HOME PAGE
 - renders home page and components
 - renders modal generate job
 - renders modal add job
@@ -30,6 +30,18 @@ Test in home page
 
 ```
 
+Test in layout
+
+```bash
+# Case to test render and components in LAYOUT
+- renders layout
+
+```
+
 ### Result
 
 ![alt text](image.png)
+
+```
+
+```

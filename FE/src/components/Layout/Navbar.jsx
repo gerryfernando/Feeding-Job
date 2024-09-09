@@ -13,12 +13,13 @@ import React from "react";
 
 const Navbar = () => {
   return (
-    <AppBar position="absolute">
+    <AppBar data-testid="navbarComponent" position="absolute">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Stack gap={1} direction="row" display="flex" alignItems="center">
             <Work sx={{ mr: 1 }} />
             <Typography
+              data-testid="titleNavbar"
               noWrap
               color="#fff"
               fontSize="18px"
