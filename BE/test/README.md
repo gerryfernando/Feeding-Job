@@ -4,7 +4,10 @@ This is a unit testing file using Jest and Supertest
 
 ## Getting Started
 
-Follow these instructions to run this test running on your local machine.
+Follow these instructions to run this test on your local machine.
+
+- [Jest](https://jestjs.io/)
+- [Supertest](https://github.com/visionmedia/supertest)
 
 ### Run
 
